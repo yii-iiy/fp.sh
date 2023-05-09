@@ -11,7 +11,7 @@
 
 ## Playings
 
-### Fib
+### Fibonacci
 
 *stream/lazylist/unfold/iterator style :*
 
@@ -88,6 +88,112 @@ fielder=",$IFS" _tuple -- x y < <(echo 'XX, YY') # then $x will be "XX" and $y w
 ~~~
 
 ### `iterate`
+
+*see the Fibonacci ...*
+
+### `per`
+
+~~~ sh
+seq 2 2 8 | cat -n | f='echo "$x -> $y"' fp per x y
+~~~
+
+~~~
+1 -> 2
+2 -> 4
+3 -> 6
+4 -> 8
+~~~
+
+~~~ sh
+echo a,b,c:d,e,f: | fielder=, f='echo "$z ~ $x -> $y"' fp per -d : -- y x z
+~~~
+
+~~~
+c ~ b -> a
+f ~ e -> d
+~~~
+
+### `reduce`
+
+~~~ sh
+seq 7 | acc=3 f='echo $((x + acc))' fp reduce -- x # 31
+echo a,b,c:d,e,f: | fielder=, acc='' f='echo "$y .. $z .. $x ~ $acc"' fp reduce -d : -- x y z # e .. f .. d ~ b .. c .. a ~
+~~~
+
+*or see the Fibonacci ...*
+
+### `map`
+
+~~~ sh
+seq 2 2 8 | cat -n | f='"$x -> $y"' fp map x y
+~~~
+
+~~~
+1 -> 2
+2 -> 4
+3 -> 6
+4 -> 8
+~~~
+
+~~~ sh
+echo a,b,c:d,e,f: | fielder=, f='"$z ~ $x -> $y"' fp map -d : -- y x z
+~~~
+
+~~~
+c ~ b -> a
+f ~ e -> d
+~~~
+
+### `formatf`
+
+~~~ sh
+formatter=' _%s' fp formatf $(seq 12)
+~~~
+
+~~~
+ _1 _2 _3 _4 _5 _6 _7 _8 _9 _10 _11 _12
+~~~
+
+*equal with :*
+
+~~~ sh
+f='printf \ _%s "$x"' fp per x < <(seq 12)
+~~~
+
+### `repeat`
+
+~~~ sh
+repeater=21 fp repeat AA BBB CCCC
+~~~
+
+~~~
+AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA
+BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB BBB
+CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC CCCC
+~~~
+
+~~~ sh
+ofs='!?::' repeater=5 fp repeat AA BBB CCCC
+~~~
+
+~~~
+AA!?::AA!?::AA!?::AA!?::AA!?::
+BBB!?::BBB!?::BBB!?::BBB!?::BBB!?::
+CCCC!?::CCCC!?::CCCC!?::CCCC!?::CCCC!?::
+~~~
+
+~~~ sh
+ofs=' ' concater=$'\n:;;:' repeater=3 fp repeat AA BBB CCCC
+~~~
+
+~~~
+AA AA AA
+:;;:BBB BBB BBB
+:;;:CCCC CCCC CCCC
+:;;:
+~~~
+
+
 
 
 
