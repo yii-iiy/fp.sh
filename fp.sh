@@ -138,8 +138,40 @@ fp ()
     # ofs=' ' concater=$'\n:;;:' repeater=3 fp repeat AA BBB CCCC
     repeat () (formatf "$@" | f='"'"$(echo $(concater="${ofs:-$concater}" f='"\$str"' map _ < <(seq "${repeater:-3}") ) )"'"' map str) &&
     
-    #
-    unfold () (seq "${@:-13}" | f="'${unfolder}'" map _ | init="$init" acc="$initer" ) &&
+    # init='0 0 1' initer='Tuple -- x y z < <(echo "$init") && echo "$x $y $z"' unfolder=' { Tuple -- x y z < <(echo "$((x + 1)) $((z)) $((y + z))") && echo "$x $y $z" ; } ' delimiter=' &&' ender=: fp unfold seq 13
+    unfold () ("$@" | f="'${unfolder}'" map _ | acc="$initer" concater="${delimiter:-$concater}" f='echo "${acc} ${processes}"' reduce -- processes | init="$init" eval "$(cat -) ${ender:-:}") &&
+    
+    UnFolders ()
+    {
+        
+        # seq 13 |
+        #     
+        #     f="'"' { Tuple -- x y z < <(echo "$((x + 1)) $((z)) $((y + z))") && echo "$x $y $z" ; } '"'" fp map _ |
+        #     acc='Tuple -- x y z < <(echo "$init") && echo "$x $y $z"' f='echo "${acc} ${processes}"' concater=' &&' fp reduce -- processes |
+        #     init='0 0 1' eval "$(cat -) :"
+        
+        : outer='printf "%s, " "$x $y"' n=16 fib
+        
+        fib ()
+        (
+            outer="${outer:-echo \"\$x \$y \$z\"}" \
+            init='0 0 1' initer='Tuple -- x y z < <(echo "$init") && '"$outer" \
+            unfolder=' { Tuple -- x y z < <(echo "$((x + 1)) $((z)) $((y + z))") && '"$outer"' ; } ' \
+            delimiter=' &&' ender=: \
+            fp unfold seq "${n:-13}" &&
+            
+            : ) ;
+        
+        # outer='printf "%s, " "$x $y"' n=13 fib
+        # 0 0, 1 1, 2 1, 3 2, 4 3, 5 5, 6 8, 7 13, 8 21, 9 34, 10 55, 11 89, 12 144, 13 233, 
+        
+        :;
+        
+        "$@" &&
+        
+        :;
+        
+    } &&
     
     "$@" &&
     
