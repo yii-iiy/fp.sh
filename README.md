@@ -81,11 +81,20 @@ ofs=' ' fib 13 | f='"$x $y"' fp map -- x y _ _ | tac | f='printf "%s, " "$x $y"'
 *unfold style :*
 
 ~~~ sh
-
+fib ()
+(
+    outer="${outer:-echo \"\$x \$y \$z\"}" \
+    init='0 0 1' initer='Tuple -- x y z < <(echo "$init") && '"$outer" \
+    unfolder=' { Tuple -- x y z < <(echo "$((x + 1)) $((z)) $((y + z))") && '"$outer"' ; } ' \
+    delimiter=' &&' ender=: \
+    fp unfold seq "${n:-13}" &&
+    
+    : ) ;
 ~~~
 
 ~~~
-
+outer='printf "%s, " "$x $y"' n=13 fib
+# 0 0, 1 1, 2 1, 3 2, 4 3, 5 5, 6 8, 7 13, 8 21, 9 34, 10 55, 11 89, 12 144, 13 233, 
 ~~~
 
 ## Funcs
@@ -112,6 +121,24 @@ U W U
 
   U W U
 ~~~
+
+
+### `formatf`
+
+~~~ sh
+formatter=' _%s' fp formatf $(seq 12)
+~~~
+
+~~~
+ _1 _2 _3 _4 _5 _6 _7 _8 _9 _10 _11 _12
+~~~
+
+*equal with :*
+
+~~~ sh
+f='printf \ _%s "$x"' fp per x < <(seq 12)
+~~~
+
 
 ### `iterate`
 
@@ -172,21 +199,6 @@ f ~ e -> d
 
 ~~~
 
-### `formatf`
-
-~~~ sh
-formatter=' _%s' fp formatf $(seq 12)
-~~~
-
-~~~
- _1 _2 _3 _4 _5 _6 _7 _8 _9 _10 _11 _12
-~~~
-
-*equal with :*
-
-~~~ sh
-f='printf \ _%s "$x"' fp per x < <(seq 12)
-~~~
 
 ### `repeat`
 
@@ -220,6 +232,10 @@ ofs=' ' concater=$'\n:;;:' repeater=3 fp repeat AA BBB CCCC
 :;;:CCCC CCCC CCCC
 :;;:
 ~~~
+
+### `unfold`
+
+*also see the Fibonacci ...*
 
 
 
